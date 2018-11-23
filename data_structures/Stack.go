@@ -111,4 +111,4 @@ func (s *Stack) Execute() {
 func main() {
 	stack := Stack{}
 	stack.Execute()
-}
+} 
