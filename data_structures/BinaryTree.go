@@ -17,14 +17,14 @@ type BinaryTree struct {
 }
 
 // String prints a visual representation of the tree
-func (bt *BinaryTree) String() {
+func (bt *BinaryTree) String1() {
 	fmt.Println("------------------------------------------------")
 	stringify(bt.root, 0)
 	fmt.Println("------------------------------------------------")
 }
 
 // internal recursive function to print a tree
-func stringify(n *Node, level int) {
+func stringify1(n *Node, level int) {
 	if n != nil {
 		format := ""
 		for i := 0; i < level; i++ {
@@ -52,5 +52,5 @@ func main() {
 
 	tree := BinaryTree{root: &j}
 
-	tree.String()
+	tree.String1()
 }
