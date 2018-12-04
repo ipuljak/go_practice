@@ -53,19 +53,50 @@ func (bst *BinarySearchTree) Add(v int) {
 	}
 }
 
-// Preorder - Print the preorder traversal of the Binary Search Tree
-func (bst *BinarySearchTree) Preorder() {
+// PREORDER BST TRAVERSAL
 
+// Preorder - Return the slice of node values given a Binary Search Tree
+func (bst *BinarySearchTree) Preorder() []int {
+	return PreorderTraversal(bst.root, []int{})
 }
+
+// PreorderTraversal - Traverse the given node and running slice of values
+func PreorderTraversal(root *Node, order []int) []int {
+	return order
+}
+
+// INORDER BST TRAVERSAL
 
 // Inorder - Print the inorder traversal of the Binary Search Tree
-func (bst *BinarySearchTree) Inorder() {
-
+func (bst *BinarySearchTree) Inorder() []int {
+	return InorderTraversal(bst.root, []int{})
 }
 
-// Postorder - Print the postorder traversal of the Binary Search Tree
-func (bst *BinarySearchTree) Postorder() {
+// InorderTraversal - Traverse the given node and running slice of values
+func InorderTraversal(root *Node, order []int) []int {
+	if root.left != nil {
+		return InorderTraversal(root.left, order)
+	}
 
+	order = append(order, root.value)
+
+	if root.right != nil {
+		return InorderTraversal(root.right, order)
+	}
+
+	return order
+}
+
+// POSTORDER BST TRAVERSAL
+
+// Postorder - Print the postorder traversal of the Binary Search Tree
+func (bst *BinarySearchTree) Postorder() []int {
+	return PostorderTraversal(bst.root, []int{})
+}
+
+// PostorderTraversal - Traverse the given node and running slice of values
+func PostorderTraversal(root *Node, order []int) []int {
+	return order
 }
 
 // String prints a visual representation of the tree
@@ -106,4 +137,7 @@ func main() {
 	tree.Add(12)
 
 	tree.String()
+
+	preorder := tree.Preorder()
+	fmt.Println("Preorder Traversal - ", preorder)
 }
