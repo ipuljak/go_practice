@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 )
 
@@ -56,13 +57,20 @@ func (bst *BinarySearchTree) Add(v int) {
 // PREORDER BST TRAVERSAL
 
 // Preorder - Return the slice of node values given a Binary Search Tree
-func (bst *BinarySearchTree) Preorder() []int {
-	return PreorderTraversal(bst.root, []int{})
+func (bst *BinarySearchTree) Preorder(ch chan string) {
+	PreorderTraversal(bst.root, ch)
+	close(ch)
 }
 
 // PreorderTraversal - Traverse the given node and running slice of values
-func PreorderTraversal(root *Node, order []int) []int {
-	return order
+func PreorderTraversal(root *Node, ch chan string) {
+	if root == nil {
+		return
+	}
+
+	ch <- fmt.Sprintf("%v", root.value)
+	PreorderTraversal(root.left, ch)
+	PreorderTraversal(root.right, ch)
 }
 
 // INORDER BST TRAVERSAL
@@ -138,6 +146,22 @@ func main() {
 
 	tree.String()
 
-	preorder := tree.Preorder()
-	fmt.Println("Preorder Traversal - ", preorder)
+	// PREORDER TRAVERSAL
+
+	preorderChannel := make(chan string)
+	preorderBuffer := new(bytes.Buffer)
+
+	go tree.Preorder(preorderChannel)
+
+	for {
+		val, i := <-preorderChannel
+		if !i {
+			break
+		}
+
+		preorderBuffer.WriteString(val)
+		preorderBuffer.WriteString(" ")
+	}
+
+	fmt.Println("Preorder Traversal - ", preorderBuffer.String())
 }
