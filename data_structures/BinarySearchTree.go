@@ -56,6 +56,26 @@ func (bst *BinarySearchTree) Add(v int) {
 
 // PREORDER BST TRAVERSAL
 
+// PrintPreorder - Print the preorder traversal of the tree
+func (bst *BinarySearchTree) PrintPreorder() {
+	preorderChannel := make(chan string)
+	preorderBuffer := new(bytes.Buffer)
+
+	go bst.Preorder(preorderChannel)
+
+	for {
+		val, i := <-preorderChannel
+		if !i {
+			break
+		}
+
+		preorderBuffer.WriteString(val)
+		preorderBuffer.WriteString(" ")
+	}
+
+	fmt.Println("Preorder Traversal - ", preorderBuffer.String())
+}
+
 // Preorder - Return the slice of node values given a Binary Search Tree
 func (bst *BinarySearchTree) Preorder(ch chan string) {
 	PreorderTraversal(bst.root, ch)
@@ -75,36 +95,80 @@ func PreorderTraversal(root *Node, ch chan string) {
 
 // INORDER BST TRAVERSAL
 
+// PrintInorder - Print the inorder traversal of the tree
+func (bst *BinarySearchTree) PrintInorder() {
+	inorderChannel := make(chan string)
+	inorderBuffer := new(bytes.Buffer)
+
+	go bst.Inorder(inorderChannel)
+
+	for {
+		val, i := <-inorderChannel
+		if !i {
+			break
+		}
+
+		inorderBuffer.WriteString(val)
+		inorderBuffer.WriteString(" ")
+	}
+
+	fmt.Println("Inorder Traversal - ", inorderBuffer.String())
+}
+
 // Inorder - Print the inorder traversal of the Binary Search Tree
-func (bst *BinarySearchTree) Inorder() []int {
-	return InorderTraversal(bst.root, []int{})
+func (bst *BinarySearchTree) Inorder(ch chan string) {
+	InorderTraversal(bst.root, ch)
+	close(ch)
 }
 
 // InorderTraversal - Traverse the given node and running slice of values
-func InorderTraversal(root *Node, order []int) []int {
-	if root.left != nil {
-		return InorderTraversal(root.left, order)
+func InorderTraversal(root *Node, ch chan string) {
+	if root == nil {
+		return
 	}
 
-	order = append(order, root.value)
-
-	if root.right != nil {
-		return InorderTraversal(root.right, order)
-	}
-
-	return order
+	InorderTraversal(root.left, ch)
+	ch <- fmt.Sprintf("%v", root.value)
+	InorderTraversal(root.right, ch)
 }
 
 // POSTORDER BST TRAVERSAL
 
+// PrintPostorder - Print the postorder traversal of the tree
+func (bst *BinarySearchTree) PrintPostorder() {
+	postorderChannel := make(chan string)
+	postorderBuffer := new(bytes.Buffer)
+
+	go bst.Postorder(postorderChannel)
+
+	for {
+		val, i := <-postorderChannel
+		if !i {
+			break
+		}
+
+		postorderBuffer.WriteString(val)
+		postorderBuffer.WriteString(" ")
+	}
+
+	fmt.Println("Postorder Traversal - ", postorderBuffer.String())
+}
+
 // Postorder - Print the postorder traversal of the Binary Search Tree
-func (bst *BinarySearchTree) Postorder() []int {
-	return PostorderTraversal(bst.root, []int{})
+func (bst *BinarySearchTree) Postorder(ch chan string) {
+	PostorderTraversal(bst.root, ch)
+	close(ch)
 }
 
 // PostorderTraversal - Traverse the given node and running slice of values
-func PostorderTraversal(root *Node, order []int) []int {
-	return order
+func PostorderTraversal(root *Node, ch chan string) {
+	if root == nil {
+		return
+	}
+
+	PostorderTraversal(root.left, ch)
+	PostorderTraversal(root.right, ch)
+	ch <- fmt.Sprintf("%v", root.value)
 }
 
 // String prints a visual representation of the tree
@@ -146,22 +210,7 @@ func main() {
 
 	tree.String()
 
-	// PREORDER TRAVERSAL
-
-	preorderChannel := make(chan string)
-	preorderBuffer := new(bytes.Buffer)
-
-	go tree.Preorder(preorderChannel)
-
-	for {
-		val, i := <-preorderChannel
-		if !i {
-			break
-		}
-
-		preorderBuffer.WriteString(val)
-		preorderBuffer.WriteString(" ")
-	}
-
-	fmt.Println("Preorder Traversal - ", preorderBuffer.String())
+	tree.PrintPreorder()
+	tree.PrintInorder()
+	tree.PrintPostorder()
 }
