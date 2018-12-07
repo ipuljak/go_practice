@@ -54,6 +54,11 @@ func (bst *BinarySearchTree) Add(v int) {
 	}
 }
 
+// Remove - Remove a node from the Binary Search Tree
+func (bst *BinarySearchTree) Remove(v int) {
+
+}
+
 // PREORDER BST TRAVERSAL
 
 // PrintPreorder - Print the preorder traversal of the tree
