@@ -2,5 +2,8 @@ package main
 
 func main() {
 	//mainExamples()
-	mainPointers()
+	//mainPointers()
+	//mainJson()
+	//mainSorting()
+	mainBcrypt()
 }
