@@ -39,7 +39,7 @@ func bar(h human) {
 	}
 }
 
-func doStuff() {
+func mainExamples() {
 	a1 := agent{
 		person:   person{"Bob", "Dole"},
 		id:       1,
