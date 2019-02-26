@@ -6,7 +6,7 @@ import (
 	"sync"
 )
 
-func mainRaceCondition() {
+func mainMutex() {
 	fmt.Println("CPU's: ", runtime.NumCPU())
 	fmt.Println("# Goroutines before: ", runtime.NumGoroutine())
 
@@ -18,14 +18,18 @@ func mainRaceCondition() {
 
 	wg1.Add(gs)
 
+	var mu sync.Mutex
+
 	for i := 0; i < gs; i++ {
 		go func() {
+			mu.Lock()
 			// every go func will be accessing a different v but same counter
 			v := counter
 			// Can run time.sleep(time.Second) or Gosched to yield the processor
 			runtime.Gosched()
 			v++
 			counter = v
+			mu.Unlock()
 			wg1.Done()
 		}()
 	}
@@ -36,6 +40,7 @@ func mainRaceCondition() {
 	fmt.Println("# Goroutines after: ", runtime.NumGoroutine())
 	fmt.Println("Count: ", counter)
 
-	// There's a race condition here - the counter doesn't get updated to 100 as expected
 	// There is a race condition because we have multiple goroutines accessing a shared variable
+	// What we need is for a goroutine to HOLD onto that variable while it is using it so that nothing else can touch it until it's done
+	// Mutex is all about locking access to a certain variable
 }

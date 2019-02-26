@@ -7,5 +7,6 @@ func main() {
 	//mainSorting()
 	//mainBcrypt()
 	//mainWaitGroup()
-	mainRaceCondition()
+	//mainRaceCondition()
+	mainMutex()
 }
