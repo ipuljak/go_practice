@@ -5,5 +5,6 @@ func main() {
 	//mainPointers()
 	//mainJson()
 	//mainSorting()
-	mainBcrypt()
+	//mainBcrypt()
+	mainWaitGroup()
 }
