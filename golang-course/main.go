@@ -8,5 +8,6 @@ func main() {
 	//mainBcrypt()
 	//mainWaitGroup()
 	//mainRaceCondition()
-	mainMutex()
+	//mainMutex()
+	mainAtomic()
 }
