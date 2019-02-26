@@ -6,5 +6,6 @@ func main() {
 	//mainJson()
 	//mainSorting()
 	//mainBcrypt()
-	mainWaitGroup()
+	//mainWaitGroup()
+	mainRaceCondition()
 }
