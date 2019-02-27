@@ -40,9 +40,72 @@ func understandingChannels() {
 }
 
 func directionalChannels() {
+	c := make(chan int, 2)
 
+	// These wont work
+	// c := make(chan <- int, 2)
+	// c := make(chan(<-chan int, 2))
+
+	// Receiving channel
+	cr := make(<-chan int)
+
+	// Sending channel
+	cs := make(chan<- int)
+
+	fmt.Println(<-c)
+	fmt.Println(<-c)
+	fmt.Println("-------")
+	fmt.Println("%T\n", c)
+	fmt.Println("%T\n", cr)
+	fmt.Println("%T\n", cs)
+}
+
+func usingChannels() {
+	c := make(chan int)
+
+	// send
+	go fooSend(c)
+
+	// receive
+	//go barReceive(c)
+	barReceive(c) // This is now blocking until the value is sent (similar to waitGroup)
+
+	fmt.Println("About to exit...")
+}
+
+// send (SEND ONLY CHANNEL)
+func fooSend(c chan<- int) {
+	c <- 42
+}
+
+// receive (RECEIVE ONLY CHANNEL)
+func barReceive(c <-chan int) {
+	fmt.Println(<-c)
+}
+
+// Range channels
+func rangeChannels() {
+	c := make(chan int)
+
+	// send
+	go fooSendRange(c)
+
+	// receive
+	for v := range c {
+		fmt.Println(v)
+	}
+
+	fmt.Println("About to exit...")
+}
+
+// send (SEND ONLY CHANNEL)
+func fooSendRange(c chan<- int) {
+	for i := 0; i < 100; i++ {
+		c <- i
+	}
+	close(c)
 }
 
 func mainChannels() {
-	directionalChannels()
+	rangeChannels()
 }
