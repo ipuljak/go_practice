@@ -9,5 +9,6 @@ func main() {
 	//mainWaitGroup()
 	//mainRaceCondition()
 	//mainMutex()
-	mainAtomic()
+	//mainAtomic()
+	mainChannels()
 }
