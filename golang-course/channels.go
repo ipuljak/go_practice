@@ -1,6 +1,11 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"math/rand"
+	"sync"
+	"time"
+)
 
 func understandingChannels() {
 	// c := make(chan int) // a channel onto which I can put integers
@@ -106,6 +111,172 @@ func fooSendRange(c chan<- int) {
 	close(c)
 }
 
+// Channels block
+// Range over channel blocks
+
+// Select
+
+func selectChannels() {
+	eve := make(chan int)
+	odd := make(chan int)
+	quit := make(chan int)
+
+	// send
+	go send(eve, odd, quit)
+
+	// receieve
+	receive(eve, odd, quit)
+
+	fmt.Println("About to exit...")
+}
+
+// Onto the channels we are going to send ints
+func send(e, o, q chan<- int) {
+	for i := 0; i < 100; i++ {
+		if i%2 == 0 {
+			e <- i
+		} else {
+			o <- i
+		}
+	}
+	close(e)
+	close(o)
+	q <- 0
+}
+
+func receive(e, o, q <-chan int) {
+	for {
+		select {
+		case v := <-e:
+			fmt.Println("From the even channel: ", v)
+		case v := <-o:
+			fmt.Println("From the odd channel: ", v)
+		case v := <-q:
+			fmt.Println("From the quit channel", v)
+			return
+		}
+	}
+}
+
+// Fan In Pattern
+// Have a lot of work to do. Should fan it out to as many goroutines as possible so they can all be working on something
+// When we get results, we'll fan those results back into a channel and then we'll have a channel with just those results
+// Uses comma ok idiom
+
+func fanInChannels() {
+	even := make(chan int)
+	odd := make(chan int)
+	fanin := make(chan int)
+
+	go send1(even, odd)
+
+	go receive1(even, odd, fanin)
+
+	for v := range fanin {
+		fmt.Println(v)
+	}
+
+	fmt.Println("about to exit")
+}
+
+func send1(even, odd chan<- int) {
+	for i := 0; i < 100; i++ {
+		if i%2 == 0 {
+			even <- i
+		} else {
+			odd <- i
+		}
+	}
+	close(even)
+	close(odd)
+}
+
+func receive1(even, odd <-chan int, fanin chan<- int) {
+	var wg sync.WaitGroup
+	wg.Add(2)
+
+	go func() {
+		for v := range even {
+			fanin <- v
+		}
+		wg.Done()
+	}()
+
+	go func() {
+		for v := range odd {
+			fanin <- v
+		}
+		wg.Done()
+	}()
+
+	wg.Wait()
+	close(fanin)
+}
+
+// Fan out
+// Taking a chunk of work, and doing everything altogether at once instead of 1 by 1
+// Example: Need to process a 1000 videos
+// Instead of processing them serially (one at a time), instead spawn 1000 goroutines and have each one do them
+
+func fanOutChannels() {
+	c1 := make(chan int)
+	c2 := make(chan int)
+
+	go populate(c1)
+
+	go fanOutIn(c1, c2)
+
+	for v := range c2 {
+		fmt.Println(v)
+	}
+
+	fmt.Println("About to exit...")
+}
+
+func populate(c chan int) {
+	for i := 0; i < 100; i++ {
+		c <- i
+	}
+	close(c)
+}
+
+func fanOutIn(c1, c2 chan int) {
+	var wg sync.WaitGroup
+
+	// IF YOU WANT TO THROTTLE (add a max amount of goroutines to spawn)
+	const goroutines = 10
+	wg.Add(goroutines)
+	// change next line to
+	for i := 0; i < goroutines; i++ {
+		go func() {
+			for v := range c1 {
+				func(v2 int) {
+					c2 <- timeConsumingWork(v2)
+				}(v)
+			}
+			wg.Done()
+		}()
+	}
+
+	// NON THROTTLING VERSION
+	// for v := range c1 {
+	// 	wg.Add(1)
+
+	// 	go func(v2 int) {
+	// 		c2 <- timeConsumingWork(v2)
+	// 		wg.Done()
+	// 	}(v)
+	// }
+
+	wg.Wait()
+	close(c2)
+}
+
+func timeConsumingWork(n int) int {
+	time.Sleep(time.Microsecond * time.Duration(rand.Intn(500)))
+	return n + rand.Intn(1000)
+}
+
 func mainChannels() {
-	rangeChannels()
+	fanOutChannels()
 }
